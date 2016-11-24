@@ -7,10 +7,14 @@ import com.stayfprod.github.R;
 import com.stayfprod.github.api.ApiClient;
 import com.stayfprod.github.event.ErrorEvent;
 import com.stayfprod.github.event.SearchEvent;
+import com.stayfprod.github.event.StopProgressEvent;
+import com.stayfprod.github.model.SearchItem;
 import com.stayfprod.github.model.SearchResponse;
 import com.stayfprod.github.util.ErrorUtils;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,6 +29,11 @@ public class MainPresenter extends LazyListPresenter {
         setNeedDownloadMore(false);
 
         final int remRequestNum = incrementAndGetReqNumber();
+
+        if (query == null || query.trim().isEmpty()) {
+            EventBus.getDefault().postSticky(new StopProgressEvent());
+            return;
+        }
 
         Call<SearchResponse> call = ApiClient.SERVICE.findRepositories(query, mPage, LIMIT, SORT_TYPE, ORDER_TYPE);
         call.enqueue(new Callback<SearchResponse>() {

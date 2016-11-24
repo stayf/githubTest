@@ -27,6 +27,7 @@ import com.stayfprod.github.R;
 import com.stayfprod.github.databinding.FragmentMainBinding;
 import com.stayfprod.github.event.ErrorEvent;
 import com.stayfprod.github.event.SearchEvent;
+import com.stayfprod.github.event.StopProgressEvent;
 import com.stayfprod.github.presenter.MainPresenter;
 import com.stayfprod.github.ui.adapter.SearchAdapter;
 import com.stayfprod.github.util.RecyclerViewLazyScrollListener;
@@ -74,6 +75,11 @@ public class MainFragment extends Fragment {
     public void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(StopProgressEvent event) {
+        stopProgress();
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -164,11 +170,10 @@ public class MainFragment extends Fragment {
     }
 
     public void performSearch(String text) {
-        if (text == null || text.trim().isEmpty())
-            return;
-
-        if (mMainPresenter.isFirstPage())
-            mBind.refresh.setRefreshing(true);
+        if (text != null && !text.trim().isEmpty()) {
+            if (mMainPresenter.isFirstPage())
+                mBind.refresh.setRefreshing(true);
+        }
 
         mMainPresenter.findRepositoriesAsync(text);
     }
