@@ -80,6 +80,7 @@ public class MainFragment extends Fragment {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onMessageEvent(StopProgressEvent event) {
         stopProgress();
+        EventBus.getDefault().removeStickyEvent(StopProgressEvent.class);
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -91,6 +92,7 @@ public class MainFragment extends Fragment {
 
         mSearchAdapter.updateList(event.items);
         mBind.emptyResult.setVisibility(mSearchAdapter.isEmptyList() ? View.VISIBLE : View.GONE);
+        EventBus.getDefault().removeStickyEvent(SearchEvent.class);
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -98,6 +100,7 @@ public class MainFragment extends Fragment {
         stopProgress();
         if (mMainPresenter.isFirstPage())
             showSnackBar(mBind.getRoot(), event.errDesc);
+        EventBus.getDefault().removeStickyEvent(ErrorEvent.class);
     }
 
     @Nullable
