@@ -2,7 +2,6 @@ package com.stayfprod.github.model;
 
 import com.google.gson.annotations.SerializedName;
 
-
 public class SearchItem {
 
     public long id;

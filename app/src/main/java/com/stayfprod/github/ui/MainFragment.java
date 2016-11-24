@@ -49,12 +49,6 @@ public class MainFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    public void setTitle(String title) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setTitle(title);
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -67,6 +61,7 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         mMainPresenter = new MainPresenter();
+        EventBus.getDefault().removeAllStickyEvents();
     }
 
     @Override
@@ -77,29 +72,26 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onStop() {
-        super.onStop();
         EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onMessageEvent(SearchEvent event) {
         stopProgress();
-        mSearchAdapter.updateList(event.items);
 
-        if (mSearchAdapter.isEmptyList()) {
-            mBind.emptyResult.setVisibility(View.VISIBLE);
-        } else {
-            mBind.emptyResult.setVisibility(View.GONE);
-        }
+        if (event.page == 0)
+            mSearchAdapter.cleanList();
+
+        mSearchAdapter.updateList(event.items);
+        mBind.emptyResult.setVisibility(mSearchAdapter.isEmptyList() ? View.VISIBLE : View.GONE);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ErrorEvent event) {
         stopProgress();
-        boolean isFirstRequest = mMainPresenter.isFirstPage();
-        if (isFirstRequest) {
+        if (mMainPresenter.isFirstPage())
             showSnackBar(mBind.getRoot(), event.errDesc);
-        }
     }
 
     @Nullable
@@ -113,7 +105,6 @@ public class MainFragment extends Fragment {
             LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
             mBind.list.setLayoutManager(layoutManager);
             mBind.list.setAdapter(mSearchAdapter);
-
             mBind.list.addOnScrollListener(
                     new RecyclerViewLazyScrollListener(getContext(), layoutManager, this::performSearch) {
                         public boolean isNeedDownloadMore() {
@@ -134,22 +125,12 @@ public class MainFragment extends Fragment {
         outState.putString(SEARCH_KEY, mSearchString);
     }
 
-    @Nullable
-    public ActionBar getSupportActionBar() {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof AppCompatActivity) {
-            AppCompatActivity compatActivity = (AppCompatActivity) activity;
-            return compatActivity.getSupportActionBar();
-        }
-        return null;
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         inflater.inflate(R.menu.menu_main, menu);
-        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
         mSearchView = (SearchView) searchItem.getActionView();
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
 
@@ -183,13 +164,11 @@ public class MainFragment extends Fragment {
     }
 
     public void performSearch(String text) {
-        if (text == null || text.trim().isEmpty()) {
+        if (text == null || text.trim().isEmpty())
             return;
-        }
 
-        if (mMainPresenter.isFirstPage()) {
+        if (mMainPresenter.isFirstPage())
             mBind.refresh.setRefreshing(true);
-        }
 
         mMainPresenter.findRepositoriesAsync(text);
     }
@@ -203,6 +182,8 @@ public class MainFragment extends Fragment {
     }
 
     public void showSnackBar(View root, String msg, View.OnClickListener action, String actionButton, boolean isIndefinite) {
+        if (msg == null)
+            msg = "";
         Snackbar snackbar = Snackbar.make(root, msg, isIndefinite ? Snackbar.LENGTH_INDEFINITE : Snackbar.LENGTH_LONG);
 
         View view = snackbar.getView();

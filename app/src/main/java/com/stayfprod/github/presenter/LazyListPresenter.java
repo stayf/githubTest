@@ -1,14 +1,12 @@
 package com.stayfprod.github.presenter;
 
 
-public abstract class AbsPresenter {
-    protected static final int LIMIT = 50;
-    protected final static String SORT_TYPE = "stars";
-    protected final static String ORDER_TYPE = "desc";
+public abstract class LazyListPresenter {
+    static final int LIMIT = 50;
 
     protected int mPage = 0;
     protected boolean mNeedDownloadMore;
-    private int requestNum = 0;
+    private int mRequestNum = 0;
 
     protected void incrementPage() {
         this.mPage++;
@@ -27,19 +25,19 @@ public abstract class AbsPresenter {
     }
 
     protected int getCurrentReqNumber() {
-        return requestNum;
+        return mRequestNum;
     }
 
     protected int incrementAndGetReqNumber() {
-        ++requestNum;
-        return requestNum;
+        ++mRequestNum;
+        return mRequestNum;
     }
 
     public boolean isNeedDownloadMore() {
         return mNeedDownloadMore;
     }
 
-    public void setNeedDownloadMore(boolean needDownloadMore) {
+    protected void setNeedDownloadMore(boolean needDownloadMore) {
         this.mNeedDownloadMore = needDownloadMore;
     }
 }

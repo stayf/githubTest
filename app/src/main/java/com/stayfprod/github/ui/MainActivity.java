@@ -15,16 +15,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null)
-            showFragment(new MainFragment(), false);
+            showFragment(new MainFragment());
     }
 
-    public void showFragment(Fragment fragment, boolean addToBackStack) {
+    public void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_frame, fragment);
-        if (addToBackStack) {
-            transaction.addToBackStack(null);
-        }
+        transaction.add(R.id.content_frame, fragment);
         transaction.commit();
     }
-
 }

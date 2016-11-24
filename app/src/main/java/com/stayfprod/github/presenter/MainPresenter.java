@@ -2,6 +2,8 @@ package com.stayfprod.github.presenter;
 
 import android.util.Log;
 
+import com.stayfprod.github.App;
+import com.stayfprod.github.R;
 import com.stayfprod.github.api.ApiClient;
 import com.stayfprod.github.event.ErrorEvent;
 import com.stayfprod.github.event.SearchEvent;
@@ -14,7 +16,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainPresenter extends AbsPresenter {
+public class MainPresenter extends LazyListPresenter {
+
+    private final static String SORT_TYPE = "stars";
+    private final static String ORDER_TYPE = "desc";
 
     public void findRepositoriesAsync(String query) {
         setNeedDownloadMore(false);
@@ -34,10 +39,11 @@ public class MainPresenter extends AbsPresenter {
                 Log.e("continue", call.request().url() + ": code: " + response.code() + "remRequestNum=" + remRequestNum + ";requestNum=" + getCurrentReqNumber());
 
                 if (!response.isSuccessful()) {
-                    EventBus.getDefault().post(new ErrorEvent(response.code(), ErrorUtils.parseError(response).errorMessage));
+                    EventBus.getDefault().postSticky(new ErrorEvent(response.code(), ErrorUtils.parseError(response).errorMessage));
                 } else {
+                    final int page = mPage;
                     incrementPage();
-                    EventBus.getDefault().postSticky(new SearchEvent(response.body().items));
+                    EventBus.getDefault().postSticky(new SearchEvent(response.body().items, page));
                 }
 
                 setNeedDownloadMore(true);
@@ -46,7 +52,7 @@ public class MainPresenter extends AbsPresenter {
             @Override
             public void onFailure(Call<SearchResponse> call, Throwable t) {
                 setNeedDownloadMore(true);
-                EventBus.getDefault().post(new ErrorEvent(500, "Не возможно получить инфу от сервера"));
+                EventBus.getDefault().postSticky(new ErrorEvent(500, App.getContext().getString(R.string.err_fail_from_server)));
             }
         });
     }

@@ -25,7 +25,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         mLayoutInflater = LayoutInflater.from(context);
     }
 
-    public void cleanList(){
+    public void cleanList() {
         mItemList.clear();
         notifyDataSetChanged();
     }
@@ -48,8 +48,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     }
 
     public void updateList(List<SearchItem> items) {
+        int currSize = items.size();
         mItemList.addAll(items);
-        notifyDataSetChanged();
+
+        if (currSize == 0) {
+            notifyDataSetChanged();
+        } else {
+            notifyItemRangeInserted(currSize, items.size());
+        }
     }
 
     @Override

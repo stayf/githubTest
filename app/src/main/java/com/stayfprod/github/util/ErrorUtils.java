@@ -1,6 +1,5 @@
 package com.stayfprod.github.util;
 
-
 import com.stayfprod.github.api.ApiClient;
 import com.stayfprod.github.model.ErrorBody;
 

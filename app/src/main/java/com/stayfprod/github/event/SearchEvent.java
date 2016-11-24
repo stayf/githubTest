@@ -7,9 +7,10 @@ import java.util.List;
 public class SearchEvent {
 
     public List<SearchItem> items;
+    public int page;
 
-    public SearchEvent(List<SearchItem> items) {
+    public SearchEvent(List<SearchItem> items, int page) {
         this.items = items;
+        this.page = page;
     }
-
 }

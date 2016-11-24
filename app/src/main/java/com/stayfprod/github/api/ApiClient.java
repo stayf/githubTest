@@ -1,6 +1,5 @@
 package com.stayfprod.github.api;
 
-
 import com.stayfprod.github.App;
 
 import java.util.concurrent.TimeUnit;

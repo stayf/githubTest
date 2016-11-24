@@ -2,4 +2,7 @@
     <string name="app_name">Github</string>
 
     <string name="hint_search">Поиск</string>
+
+    <string name="err_no_result">Ничего не найдено</string>
+    <string name="err_fail_from_server">Не возможно получить инфу от сервера</string>
 </resources>
