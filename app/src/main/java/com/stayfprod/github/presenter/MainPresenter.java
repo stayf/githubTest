@@ -41,18 +41,14 @@ public class MainPresenter extends LazyListPresenter {
             public void onResponse(Call<SearchResponse> call, Response<SearchResponse> response) {
 
                 if (getCurrentReqNumber() != remRequestNum) {
-                    Log.e("return", call.request().url() + ": code: " + response.code() + "remRequestNum=" + remRequestNum + ";requestNum=" + getCurrentReqNumber());
                     return;
                 }
-
-                Log.e("continue", call.request().url() + ": code: " + response.code() + "remRequestNum=" + remRequestNum + ";requestNum=" + getCurrentReqNumber());
 
                 if (!response.isSuccessful()) {
                     EventBus.getDefault().postSticky(new ErrorEvent(response.code(), ErrorUtils.parseError(response).errorMessage));
                 } else {
-                    final int page = mPage;
+                    EventBus.getDefault().postSticky(new SearchEvent(response.body().items, mPage));
                     incrementPage();
-                    EventBus.getDefault().postSticky(new SearchEvent(response.body().items, page));
                 }
 
                 setNeedDownloadMore(true);
