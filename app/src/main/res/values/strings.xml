@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Github</string>
+
+    <string name="hint_search">Поиск</string>
+</resources>
