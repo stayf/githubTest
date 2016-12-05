@@ -56,6 +56,10 @@ public class MainPresenter extends LazyListPresenter {
 
             @Override
             public void onFailure(Call<SearchResponse> call, Throwable t) {
+                if (getCurrentReqNumber() != remRequestNum) {
+                    return;
+                }
+
                 setNeedDownloadMore(true);
                 EventBus.getDefault().postSticky(new ErrorEvent(500, App.getContext().getString(R.string.err_fail_from_server)));
             }
