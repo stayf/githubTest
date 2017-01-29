@@ -15,6 +15,7 @@ import com.stayfprod.github.util.ErrorUtils;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,12 +47,13 @@ public class MainPresenter extends LazyListPresenter {
 
                 if (!response.isSuccessful()) {
                     EventBus.getDefault().postSticky(new ErrorEvent(response.code(), ErrorUtils.parseError(response).errorMessage));
+                    setNeedDownloadMore(true);
                 } else {
-                    EventBus.getDefault().postSticky(new SearchEvent(response.body().items, mPage));
+                    List<SearchItem> items = response.body().items;
+                    EventBus.getDefault().postSticky(new SearchEvent(items, mPage));
                     incrementPage();
+                    setNeedDownloadMore(items!= null && !items.isEmpty());
                 }
-
-                setNeedDownloadMore(true);
             }
 
             @Override
