@@ -5,6 +5,8 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -45,6 +47,8 @@ public class MainFragment extends Fragment {
     private MainPresenter mMainPresenter;
     private SearchAdapter mSearchAdapter;
     private FragmentMainBinding mBind;
+    private Handler mHandler;
+    private Runnable mSearchAction;
 
     public MainFragment() {
         setHasOptionsMenu(true);
@@ -62,6 +66,7 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         mMainPresenter = new MainPresenter();
+        mHandler = new Handler(Looper.getMainLooper());
         EventBus.getDefault().removeAllStickyEvents();
     }
 
@@ -161,7 +166,9 @@ public class MainFragment extends Fragment {
                 mSearchAdapter.cleanList();
                 mMainPresenter.cleanPage();
                 mSearchString = newText;
-                performSearch(newText);
+                mHandler.removeCallbacks(mSearchAction);
+                mSearchAction = () -> performSearch(newText);
+                mHandler.postDelayed(mSearchAction, 500);
                 return true;
             }
         });
